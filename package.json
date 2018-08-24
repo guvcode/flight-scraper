@@ -10,10 +10,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "express": "latest",
-    "jssoup": "0.0.9",
     "mongo": "^0.1.0",
-    "nodemon": "^1.18.3",
-    "osmosis": "^1.1.8",
     "puppeteer": "^1.7.0",
     "request": "latest",
     "request-promise": "^4.2.2",

@@ -30,8 +30,8 @@ function onRequest(){
             return browser.newPage();
         })
         .then(function (page) {
-            return page.goto(url, { waitUntil: 'networkidle2' }).then(function () {
-                sleep.sleep(30);
+            return page.goto(url, { waitUntil: 'networkidle0' }).then(function () {
+               // sleep.sleep(30);
                 console.log('return page.content() - done');
 
                 return page.content();
