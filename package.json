@@ -18,5 +18,8 @@
     "request": "latest",
     "request-promise": "^4.2.2",
     "sleep": "^5.2.3"
-  }
+  },
+  "engines": {
+    "node": "8.8.0"
+  },
 }

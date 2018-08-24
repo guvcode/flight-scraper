@@ -31,7 +31,7 @@ function onRequest(){
         })
         .then(function (page) {
             return page.goto(url).then(function () {
-                sleep.sleep(10);
+                sleep.sleep(30);
                 console.log('return page.content() - done');
 
                 return page.content();
