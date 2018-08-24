@@ -23,9 +23,7 @@ server.listen(PORT, () => {
 function onRequest(){
     console.log('Hello flights');
     puppeteer
-        .launch({
-            headless: true
-        })
+        .launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
         .then(function (browser) {
             console.log('return browser.newPage() - done');
 
