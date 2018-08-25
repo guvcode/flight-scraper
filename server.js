@@ -46,8 +46,10 @@ function loadPageOk (res){
 
                 } else {
                     var db = client.db('flights');
+                    const thisTime = Date.now();
                     db.collection('pricelist').insertOne({
-                        when: new Date(),
+                        insertTime: new Date(),
+                        milliSince:  thisTime,
                         price: currencyFormatter.unformat(cheapest, { code: 'USD' })
                     });
                     res.write('inserted\n');
@@ -62,7 +64,7 @@ function loadPageOk (res){
     });
 
 }
-
+/*
 function onRequest(){
     console.log('Hello flights');
     puppeteer
@@ -121,5 +123,5 @@ function onRequest(){
    // response.end();
 }
 
-
+*/
 
