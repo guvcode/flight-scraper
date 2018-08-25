@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 const $ = require('cheerio');
 const MongoClient = require('mongodb').MongoClient;
 const sleep = require('sleep');
+var schedule = require('node-schedule');
 
 const url = 'https://www.google.ca/flights?lite=0#flt=YYC.MCO.2018-12-18*MCO.YYZ.2018-12-25*YYZ.YYC.2018-12-29;co:1;c:CAD;e:1;s:1;px:2,1;sd:1;t:f;tt:m';
 const dburl = "mongodb://demo:P%40ssw0rd@ds131942.mlab.com:31942/flights";
@@ -20,8 +21,13 @@ server.listen(PORT, () => {
 });
 
 
+//var j = schedule.scheduleJob('09 * * * *', function(){
+ //   loadPageOk();
+//});
+
+
 function loadPageOk (){
-    puppeteer.launch({headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}).then(async browser => {
+    puppeteer.launch({headless: true,slowMo: 250, args: ['--no-sandbox', '--disable-setuid-sandbox']}).then(async browser => {
         const page = await browser.newPage();
         await page.goto(url,{waitUntil: 'networkidle2'});
         await page.waitFor(2500);
