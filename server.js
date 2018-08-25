@@ -11,7 +11,7 @@ const dburl = "mongodb://demo:P%40ssw0rd@ds131942.mlab.com:31942/flights";
 const PORT = process.env.PORT || 5030;
 
 const server = http.createServer((req, res) => {
-    console.log(currencyFormatter.unformat('CA$10.50', { code: 'USD' }))
+    //console.log(currencyFormatter.unformat('CA$1,022.50', { code: 'USD' }))
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html');
     loadPageOk(res);
