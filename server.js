@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer((req, res) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
-    onRequest();
+    loadPageOk();
     res.end('Hello World\n');
 });
 
@@ -19,6 +19,40 @@ server.listen(PORT, () => {
     console.log(`Server running on ${PORT}/`);
 });
 
+
+function loadPageOk (){
+    puppeteer.launch({headless: false}).then(async browser => {
+        const page = await browser.newPage();
+        await page.goto(url,{waitUntil: 'networkidle2'});
+        await page.waitFor(2500);
+        await page.waitFor(() => document.querySelector('#flt-progress-indicator-search > div.rdgR3WpnuxY__mux-lpi-aria-alert > span').textContent='Loaded.');
+        const pageView = await page.content();
+        var cheapest = $(pageView).find('div .gws-flights-results__cheapest-price').first().text().trim();
+        console.log('found moving on', cheapest);
+        await page.close();
+        await browser.close();
+
+        if (cheapest) {
+            MongoClient.connect(dburl, {useNewUrlParser: true}, function (err, client) {
+                if (err) {
+                    console.log('An error occurred connecting to MongoDB: ', err);
+
+                } else {
+                    var db = client.db('flights');
+                    db.collection('pricelist').insertOne({
+                        when: new Date(),
+                        price: cheapest
+                    });
+                    console.log('inserted');
+                }
+                sleep.sleep(10);
+            });
+        } else {
+            console.log('cheapset is null');
+        }
+    });
+
+}
 
 function onRequest(){
     console.log('Hello flights');
@@ -30,15 +64,17 @@ function onRequest(){
             return browser.newPage();
         })
         .then(function (page) {
-            return page.goto(url, { waitUntil: 'networkidle0' }).then(function () {
-               // sleep.sleep(30);
-                console.log('return page.content() - done');
+            return page.goto(url, { waitUntil: 'networkidle2' }).then(function () {
 
+                console.log('return page.content() - done');
+                page.waitForSelector('gws-flights-results__best-price-info');
                 return page.content();
             });
         })
         .then(function (html) {
             var cheapest = $(html).find('div .gws-flights-results__cheapest-price').first().text().trim();
+            var loaded = $(html).find('#flt-progress-indicator-search > div.rdgR3WpnuxY__mux-lpi-aria-alert').first().text().trim();
+            console.log('loaded ',loaded);
             return cheapest;
         })
         .then(function (cheapest) {
@@ -56,18 +92,11 @@ function onRequest(){
                             price: cheapest
                         });
                         console.log('inserted');
-
-                        // db.close();
                     }
                     sleep.sleep(10);
-                    // process.exit(0);
-                    //response.end();
                 });
             } else {
                 console.log('cheapset is null');
-
-                sleep.sleep(10);
-               // response.end();
             }
 
         })
