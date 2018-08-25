@@ -7,13 +7,12 @@ var schedule = require('node-schedule');
 
 const url = 'https://www.google.ca/flights?lite=0#flt=YYC.MCO.2018-12-18*MCO.YYZ.2018-12-25*YYZ.YYC.2018-12-29;co:1;c:CAD;e:1;s:1;px:2,1;sd:1;t:f;tt:m';
 const dburl = "mongodb://demo:P%40ssw0rd@ds131942.mlab.com:31942/flights";
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5030;
 
 const server = http.createServer((req, res) => {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    loadPageOk();
-    res.end('Hello World\n');
+    res.setHeader('Content-Type', 'text/html');
+    loadPageOk(res);
 });
 
 server.listen(PORT, () => {
@@ -26,7 +25,7 @@ server.listen(PORT, () => {
 //});
 
 
-function loadPageOk (){
+function loadPageOk (res){
     puppeteer.launch({headless: true,slowMo: 250, args: ['--no-sandbox', '--disable-setuid-sandbox']}).then(async browser => {
         const page = await browser.newPage();
         await page.goto(url,{waitUntil: 'networkidle2'});
@@ -34,14 +33,14 @@ function loadPageOk (){
         await page.waitFor(() => document.querySelector('#flt-progress-indicator-search > div.rdgR3WpnuxY__mux-lpi-aria-alert > span').textContent='Loaded.');
         const pageView = await page.content();
         var cheapest = $(pageView).find('div .gws-flights-results__cheapest-price').first().text().trim();
-        console.log('found moving on', cheapest);
+        res.write('found value - ', cheapest,"\n");
         await page.close();
         await browser.close();
 
         if (cheapest) {
             MongoClient.connect(dburl, {useNewUrlParser: true}, function (err, client) {
                 if (err) {
-                    console.log('An error occurred connecting to MongoDB: ', err);
+                    res.write('An error occurred connecting to MongoDB: ', err,"\n");
 
                 } else {
                     var db = client.db('flights');
@@ -49,13 +48,15 @@ function loadPageOk (){
                         when: new Date(),
                         price: cheapest
                     });
-                    console.log('inserted');
+                    res.write('inserted\n');
                 }
-                sleep.sleep(10);
+                res.end('Done\n');
             });
         } else {
-            console.log('cheapset is null');
+            res.write('cheapset is null\n');
+            res.end('Done\n');
         }
+
     });
 
 }
