@@ -9,6 +9,7 @@
   "author": "Scotch",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "currency-formatter": "^1.4.4",
     "express": "latest",
     "mongo": "^0.1.0",
     "node-schedule": "^1.3.0",

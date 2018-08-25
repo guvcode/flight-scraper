@@ -4,12 +4,14 @@ const $ = require('cheerio');
 const MongoClient = require('mongodb').MongoClient;
 const sleep = require('sleep');
 var schedule = require('node-schedule');
+var currencyFormatter = require('currency-formatter');
 
 const url = 'https://www.google.ca/flights?lite=0#flt=YYC.MCO.2018-12-18*MCO.YYZ.2018-12-25*YYZ.YYC.2018-12-29;co:1;c:CAD;e:1;s:1;px:2,1;sd:1;t:f;tt:m';
 const dburl = "mongodb://demo:P%40ssw0rd@ds131942.mlab.com:31942/flights";
 const PORT = process.env.PORT || 5030;
 
 const server = http.createServer((req, res) => {
+    console.log(currencyFormatter.unformat('CA$10.50', { code: 'USD' }))
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html');
     loadPageOk(res);
@@ -33,7 +35,7 @@ function loadPageOk (res){
         await page.waitFor(() => document.querySelector('#flt-progress-indicator-search > div.rdgR3WpnuxY__mux-lpi-aria-alert > span').textContent='Loaded.');
         const pageView = await page.content();
         var cheapest = $(pageView).find('div .gws-flights-results__cheapest-price').first().text().trim();
-        res.write('found value - ', cheapest,"\n");
+        res.write('found value - ', cheapest);
         await page.close();
         await browser.close();
 
@@ -46,7 +48,7 @@ function loadPageOk (res){
                     var db = client.db('flights');
                     db.collection('pricelist').insertOne({
                         when: new Date(),
-                        price: cheapest
+                        price: currencyFormatter.unformat(cheapest, { code: 'USD' })
                     });
                     res.write('inserted\n');
                 }
