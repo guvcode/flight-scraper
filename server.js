@@ -21,7 +21,7 @@ server.listen(PORT, () => {
 
 
 function loadPageOk (){
-    puppeteer.launch({headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox']}).then(async browser => {
+    puppeteer.launch({headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}).then(async browser => {
         const page = await browser.newPage();
         await page.goto(url,{waitUntil: 'networkidle2'});
         await page.waitFor(2500);
